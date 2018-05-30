@@ -14,6 +14,9 @@ extern crate embedded_graphics;
 
 use embedded_graphics::prelude::*;
 use embedded_graphics::primitives::{Circle, Line, Rect};
+use embedded_graphics::fonts::Font6x8;
+
+
 use ssd1306::prelude::*;
 
 
@@ -68,11 +71,7 @@ fn main()  -> result::Result<
     let sensor_settings = dev.get_sensor_settings(settings_sel);
     info!("Sensor settings: {:?}", sensor_settings);
 
-
-
-    println!("Hello, world!");
-
-    
+   
     disp.init().unwrap();
     disp.flush().unwrap();
 
@@ -84,7 +83,7 @@ fn main()  -> result::Result<
 
     disp.draw(Circle::new((96, 16 + 8), 8, 1u8).into_iter());
 
-disp.flush().unwrap();
+    disp.flush().unwrap();
 
     loop {
         thread::sleep(Duration::from_millis(5000));
@@ -97,7 +96,24 @@ disp.flush().unwrap();
         info!("Sensor Data {:?}", data);
         info!("Temperature {}°C", data.temperature_celsius());
         info!("Pressure {}hPa", data.pressure_hpa());
-    info!("Humidity {}%", data.humidity_percent());
+        info!("Humidity {}%", data.humidity_percent());
+
+        disp.clear();
+
+        disp.draw(Font6x8::render_str(&format!("Tmp: {}°C", data.temperature_celsius())).into_iter());
+        disp.draw(
+            Font6x8::render_str(&format!("Pres: {}hPa", data.pressure_hpa()))
+                .translate((0, 16))
+                .into_iter(),
+        );
+
+        disp.draw(
+            Font6x8::render_str(&format!("Hum {}%", data.humidity_percent()))
+                .translate((0, 32))
+                .into_iter(),
+        );
+
+        disp.flush().unwrap();
     }
 
 }
